@@ -81,7 +81,6 @@ public class RouteController {
         return res;
     }
 
-    // TODO: 2018/12/26 这些基于 HTTP 接口的远程通信都可以换为 SpringCloud
 
     /**
      * 私聊路由
@@ -144,8 +143,8 @@ public class RouteController {
         BaseResponse<CIMServerResVO> res = new BaseResponse();
 
         //登录校验
-        boolean login = accountService.login(loginReqVO);
-        if (login) {
+        StatusEnum status = accountService.login(loginReqVO);
+        if (status == StatusEnum.SUCCESS) {
             String server = serverCache.selectServer();
             String[] serverInfo = server.split(":");
             CIMServerResVO vo = new CIMServerResVO(serverInfo[0], Integer.parseInt(serverInfo[1]),Integer.parseInt(serverInfo[2]));
@@ -154,12 +153,10 @@ public class RouteController {
             accountService.saveRouteInfo(loginReqVO,server);
 
             res.setDataBody(vo);
-            res.setCode(StatusEnum.SUCCESS.getCode());
-            res.setMessage(StatusEnum.SUCCESS.getMessage());
-        } else {
-            res.setCode(StatusEnum.REPEAT_LOGIN.getCode());
-            res.setMessage(StatusEnum.REPEAT_LOGIN.getMessage());
+
         }
+        res.setCode(status.getCode());
+        res.setMessage(status.getMessage());
 
         return res;
     }
